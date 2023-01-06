@@ -2,11 +2,13 @@ package repository
 
 import (
 	"github.com/glebarez/sqlite"
+	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 )
 
 type Repository struct {
-	DB *gorm.DB
+	DB    *gorm.DB
+	Redis *redis.Client
 }
 
 func InitRepo() (*Repository, error) {
@@ -14,10 +16,14 @@ func InitRepo() (*Repository, error) {
 	if err != nil {
 		return &Repository{}, nil
 	}
-
 	db.AutoMigrate(&Book{}, &Library{})
 
+	rdb := redis.NewClient(&redis.Options{
+		Addr: "localhost:6379",
+	})
+
 	return &Repository{
-		DB: db,
+		DB:    db,
+		Redis: rdb,
 	}, nil
 }

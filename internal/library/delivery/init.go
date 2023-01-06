@@ -18,5 +18,7 @@ func NewLibraryHandler(router *gin.Engine, usecase *libraryUsecase.Usecase) *Han
 }
 
 func (h *Handler) SetEndpoint() {
-
+	h.router.GET("/test", func(ctx *gin.Context) {
+		h.GetLibraryByID(ctx)
+	})
 }

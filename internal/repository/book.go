@@ -13,6 +13,7 @@ type Book struct {
 	LibraryID int
 }
 
+// SQL REPO
 func (repo *Repository) GetBookByID(bookID int) (Book, error) {
 	return Book{}, nil
 }
@@ -28,3 +29,5 @@ func (repo *Repository) UpdateBook(book Book) (Book, error) {
 func (repo *Repository) DeleteBook(bookID int) error {
 	return nil
 }
+
+// Redis REPO

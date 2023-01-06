@@ -6,6 +6,7 @@ type Library struct {
 	Location string
 }
 
+// SQL REPO
 func (repo *Repository) GetLibraryByID(libraryID int) (Library, error) {
 	return Library{}, nil
 }
@@ -21,3 +22,5 @@ func (repo *Repository) UpdateLibrary(library Library) (Library, error) {
 func (repo *Repository) DeleteLibrary(libraryID int) error {
 	return nil
 }
+
+// Redis REPO
