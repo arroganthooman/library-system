@@ -16,7 +16,7 @@ func InitRepo() (*Repository, error) {
 	if err != nil {
 		return &Repository{}, nil
 	}
-	db.AutoMigrate(&Book{}, &Library{})
+	db.AutoMigrate(&Book{}, &User{}, &AuthToken{})
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr: "localhost:6379",
