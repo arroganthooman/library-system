@@ -15,6 +15,7 @@ type BookResponse struct {
 	Author     string `json:author`
 	Title      string `json:title`
 	IsBorrowed bool   `json:"is_borrowed"`
+	ID         int    `json:"id"`
 }
 
 type AllBookResponse struct {
@@ -22,4 +23,9 @@ type AllBookResponse struct {
 	Title      string `json:title`
 	IsBorrowed bool   `json:"is_borrowed"`
 	ID         int    `json:"id"`
+}
+
+type UserInfoResponse struct {
+	Username      string         `json:"username"`
+	BorrowedBooks []BookResponse `json:"borrowed_books"`
 }

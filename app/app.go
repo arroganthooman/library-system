@@ -3,6 +3,7 @@ package main
 import (
 	bookDeliv "github.com/arroganthooman/library-system/internal/book/delivery"
 	bookUcase "github.com/arroganthooman/library-system/internal/book/usecase"
+	mware "github.com/arroganthooman/library-system/internal/middleware"
 	repository "github.com/arroganthooman/library-system/internal/repository"
 	userDeliv "github.com/arroganthooman/library-system/internal/user/delivery"
 	userUcase "github.com/arroganthooman/library-system/internal/user/usecase"
@@ -17,14 +18,17 @@ func main() {
 		panic(err)
 	}
 
+	// Init middleware
+	middleware := mware.InitMiddleware(repo)
+
 	// Init library
-	userUsecase := userUcase.NewLibraryRepo(repo)
-	userDelivery := userDeliv.NewLibraryHandler(router, userUsecase)
+	userUsecase := userUcase.NewLibraryUsecase(repo)
+	userDelivery := userDeliv.NewLibraryHandler(router, userUsecase, middleware)
 	userDelivery.SetEndpoint()
 
 	// Init book
-	bookUsecase := bookUcase.NewBookRepo(repo)
-	bookDelivery := bookDeliv.NewBookHandler(router, bookUsecase)
+	bookUsecase := bookUcase.NewBookUsecase(repo)
+	bookDelivery := bookDeliv.NewBookHandler(router, bookUsecase, middleware)
 	bookDelivery.SetEndpoint()
 
 	router.Run(":8080")

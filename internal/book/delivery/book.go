@@ -70,6 +70,12 @@ func (h *Handler) GetBookByID(ctx *gin.Context) {
 			RawErrorMessage: err.Error(),
 		})
 		return
+	} else if book.Author == "" || book.Title == "" {
+		ctx.JSON(http.StatusInternalServerError, presentation.ResponseStandard{
+			Status:       http.StatusInternalServerError,
+			ErrorMessage: "No book found",
+		})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, presentation.ResponseStandard{
@@ -78,6 +84,7 @@ func (h *Handler) GetBookByID(ctx *gin.Context) {
 			Title:      book.Title,
 			Author:     book.Author,
 			IsBorrowed: book.IsBorrowed,
+			ID:         book.ID,
 		},
 	})
 }
@@ -85,7 +92,7 @@ func (h *Handler) GetBookByID(ctx *gin.Context) {
 func (h *Handler) EditBook(ctx *gin.Context) {
 	req := presentation.EditBookRequestBody{}
 	err := ctx.ShouldBindJSON(&req)
-	if err != nil || req.ID <= 0 || req.Author == "" || req.Title == "" {
+	if err != nil || req.ID <= 0 {
 		ctx.JSON(http.StatusInternalServerError, presentation.ResponseStandard{
 			Status:          http.StatusInternalServerError,
 			ErrorMessage:    "Given Request Data is not valid",
@@ -94,10 +101,24 @@ func (h *Handler) EditBook(ctx *gin.Context) {
 		return
 	}
 
+	if ctx.Request.Method == "PUT" && req.ID <= 0 && req.Author == "" && req.Title == "" {
+		ctx.JSON(http.StatusInternalServerError, presentation.ResponseStandard{
+			Status:       http.StatusInternalServerError,
+			ErrorMessage: "Given Request Data is not valid. PUT method need ID, author and title",
+		})
+		return
+	}
+
 	book := repository.Book{
-		ID:     req.ID,
-		Author: req.Author,
-		Title:  req.Title,
+		ID: req.ID,
+	}
+
+	if req.Author != "" {
+		book.Author = req.Author
+	}
+
+	if req.Title != "" {
+		book.Title = req.Title
 	}
 
 	book, err = h.usecase.EditBook(book)
@@ -116,6 +137,7 @@ func (h *Handler) EditBook(ctx *gin.Context) {
 			Title:      book.Title,
 			Author:     book.Author,
 			IsBorrowed: book.IsBorrowed,
+			ID:         book.ID,
 		},
 	})
 }
@@ -157,6 +179,7 @@ func (h *Handler) GetAllBook(ctx *gin.Context) {
 		})
 		return
 	}
+
 	var data []presentation.AllBookResponse
 	for _, book := range books {
 		data = append(data, presentation.AllBookResponse{
@@ -174,7 +197,23 @@ func (h *Handler) GetAllBook(ctx *gin.Context) {
 }
 
 func (h *Handler) BorrowBook(ctx *gin.Context) {
-	username := "tasku"
+	uname, isExists := ctx.Get("username")
+	if !isExists {
+		ctx.JSON(http.StatusInternalServerError, presentation.ResponseStandard{
+			Status:       http.StatusInternalServerError,
+			ErrorMessage: "Error when getting username from context",
+		})
+		return
+	}
+	username, ok := uname.(string)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, presentation.ResponseStandard{
+			Status:       http.StatusInternalServerError,
+			ErrorMessage: "Error when asserting type",
+		})
+		return
+	}
+
 	req := presentation.BorrowBookRequestBody{}
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil || req.BookID <= 0 {
@@ -191,6 +230,50 @@ func (h *Handler) BorrowBook(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, presentation.ResponseStandard{
 			Status:          http.StatusInternalServerError,
 			ErrorMessage:    "Error when borrowing book",
+			RawErrorMessage: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, presentation.ResponseStandard{
+		Status: http.StatusOK,
+	})
+}
+
+func (h *Handler) ReturnBook(ctx *gin.Context) {
+	uname, isExists := ctx.Get("username")
+	if !isExists {
+		ctx.JSON(http.StatusInternalServerError, presentation.ResponseStandard{
+			Status:       http.StatusInternalServerError,
+			ErrorMessage: "Error when getting username from context",
+		})
+		return
+	}
+	username, ok := uname.(string)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, presentation.ResponseStandard{
+			Status:       http.StatusInternalServerError,
+			ErrorMessage: "Error when asserting type",
+		})
+		return
+	}
+
+	req := presentation.BorrowBookRequestBody{}
+	err := ctx.ShouldBindJSON(&req)
+	if err != nil || req.BookID <= 0 {
+		ctx.JSON(http.StatusInternalServerError, presentation.ResponseStandard{
+			Status:          http.StatusInternalServerError,
+			ErrorMessage:    "Given Request Data is not valid",
+			RawErrorMessage: err.Error(),
+		})
+		return
+	}
+
+	err = h.usecase.ReturnBook(username, req.BookID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, presentation.ResponseStandard{
+			Status:          http.StatusInternalServerError,
+			ErrorMessage:    "Error when returning book",
 			RawErrorMessage: err.Error(),
 		})
 		return

@@ -1,14 +1,10 @@
 package usecase
 
-import (
-	repository "github.com/arroganthooman/library-system/internal/repository"
-)
-
 type Usecase struct {
-	repositories *repository.Repository
+	repositories UserRepository
 }
 
-func NewLibraryRepo(repo *repository.Repository) *Usecase {
+func NewLibraryUsecase(repo UserRepository) *Usecase {
 	return &Usecase{
 		repositories: repo,
 	}

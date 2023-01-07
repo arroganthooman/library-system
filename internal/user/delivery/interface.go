@@ -7,6 +7,6 @@ import (
 type Usecase interface {
 	FindUserByUsername(username string) (repo.User, error)
 	InsertUser(repo.User) error
-	EditUser(user repo.User) (repo.User, error)
+	EditUser(user repo.User, usernameFromAuth string) (repo.User, error)
 	DeleteUserByUsername(username string) error
 }

@@ -5,6 +5,7 @@ import (
 )
 
 type BookRepository interface {
+	GetAllBook() ([]repo.Book, error)
 	GetBookByID(bookID int) (repo.Book, error)
 	InsertBook(book repo.Book) error
 	UpdateBook(book repo.Book) (repo.Book, error)
