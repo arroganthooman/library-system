@@ -128,15 +128,24 @@ func (repo *Repository) CreateToken(username string) (string, error) {
 		fmt.Println("[Repo][CreateToken] Failed to insert to redis")
 	}
 
+	redisRes = repo.Redis.Set(context.Background(), fmt.Sprintf("token_username:%s", username), token, time.Hour*48)
+	if redisRes.Err() != nil {
+		log.Printf("[Repo][CreateToken] err: %+v", "Failed to insert to redis")
+		fmt.Println("[Repo][CreateToken] Failed to insert to redis")
+	}
+
 	return token, nil
 }
 
 func (repo *Repository) CheckToken(token string) (string, error) {
 	redisRes := repo.Redis.Get(context.Background(), fmt.Sprintf("token:%s", token))
-	if redisRes.Err() == nil {
-		return redisRes.String(), nil
-	} else {
+	if redisRes.Err() != nil {
 		log.Printf("[Repo][CheckToken] err: %+v", redisRes.Err())
+	} else {
+		redisUnameRes := repo.Redis.Get(context.Background(), fmt.Sprintf("token_username:%s", redisRes))
+		if redisUnameRes.Err() == nil {
+			return redisUnameRes.String(), nil
+		}
 	}
 
 	var authToken AuthToken
