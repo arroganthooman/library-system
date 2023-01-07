@@ -17,6 +17,8 @@ Books:
 - Borrow Book (POST /book/borrow)
 - Return Book (POST /book/return)
 
+You can download postman collection of request in https://ristek.link/LibSystemPostmanColl. After that you can import it to postman.
+
 **Tools Used**
 - Gin
 - GORM
