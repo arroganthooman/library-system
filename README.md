@@ -2,7 +2,11 @@
 
 A simple library system in Go language. Purposed to complete PT DOT Backend Engineer recruitment test.
 
+**Explanation Video:**
+https://www.loom.com/share/7f1f35ad9a36490a81a7a188ff1a30f2 
+
 **The key features of this system are**
+
 User:
 - Login (POST /user/login)
 - Register (POST /user/register)
